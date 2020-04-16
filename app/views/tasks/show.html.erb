@@ -1,6 +1,6 @@
 <h1>Task_No: <%= @task.id %> の詳細</h1>
 
-<p><%= @task.content %></p>
+<p><%= @task.content %> &emsp; 【Status】: <%= @task.status %></p>
 
 <%= link_to 'このTaskを編集する', edit_task_path %>
 <%= link_to 'このTaskを削除する', @task, method: :delete, data: { confirm: '本当に削除してよろしいですか？' } %>
