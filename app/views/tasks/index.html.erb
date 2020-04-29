@@ -13,6 +13,7 @@
 
 <% if logged_in? %>
   <%= link_to '新規Task登録', new_task_path %>
+  <%= link_to 'ログアウト', logout_path, method: :delete %>
 <% end %>
 
 <%= link_to 'ユーザー登録', signup_path %>

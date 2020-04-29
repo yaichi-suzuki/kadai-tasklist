@@ -1,19 +1,24 @@
 class TasksController < ApplicationController
   before_action :set_task, only: [:show, :edit, :update, :destroy]
+  before_action :require_user_logged_in, only: [:index, :show, :new, :create, :edit, :update, :destroy]
   
   def index
-    @tasks = Task.all
+    @tasks = current_user.tasks.order(id: :desc)
   end
   
   def show
+    unless current_user[:id] == @task[:user_id]
+      flash[:danger] = 'ログイン中のユーザが、タスクを登録したユーザと一致しません'
+      redirect_to '/'
+    end
   end
   
   def new
-    @task = Task.new
+    @task = current_user.tasks.build
   end
 
   def create
-    @task = Task.new(task_params)
+    @task = current_user.tasks.build(task_params)
     
     if @task.save
       flash[:success] = '新規Taskを登録しました'
@@ -29,20 +34,31 @@ class TasksController < ApplicationController
   
   def update
 
-    if @task.update(task_params)
-      flash[:success] = 'Task内容を更新しました'
-      redirect_to @task
+    if current_user[:id] == @task[:user_id]
+      if @task.update(task_params)
+        flash[:success] = 'Task内容を更新しました'
+        redirect_to @task
+      else
+        flash.now[:danger] = 'Task内容の更新に失敗しました'
+        render :edit
+      end
     else
-      flash.now[:danger] = 'Task内容の更新に失敗しました'
+      flash.now[:danger] = 'ログイン中のユーザが、タスクを登録したユーザと一致しません'
       render :edit
     end
   end
   
   def destroy
-    @task.destroy
     
-    flash[:success] = 'Taskを削除しました'
-    redirect_to tasks_url
+    if current_user[:id] == @task[:user_id]
+      @task.destroy
+    
+      flash[:success] = 'Taskを削除しました'
+      redirect_to tasks_url
+    else
+      flash.now[:danger] = 'ログイン中のユーザが、タスクを登録したユーザと一致しません'
+      render :show
+    end
   end
   
   private
