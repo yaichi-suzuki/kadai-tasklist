@@ -5,7 +5,7 @@ class TasksController < ApplicationController
   def index
     @tasks = current_user.tasks.order(id: :desc)
   end
-  
+
   def show
     unless current_user[:id] == @task[:user_id]
       flash[:danger] = 'ログイン中のユーザが、タスクを登録したユーザと一致しません'
