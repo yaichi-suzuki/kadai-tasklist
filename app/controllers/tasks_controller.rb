@@ -1,5 +1,4 @@
 class TasksController < ApplicationController
-  before_action :set_task, only: [:show, :edit, :update, :destroy]
   before_action :require_user_logged_in
   before_action :correct_user, only: [:edit, :show, :update, :destroy]
   
@@ -9,10 +8,8 @@ class TasksController < ApplicationController
   end
 
   def show
-    unless current_user[:id] == @task[:user_id]
-      flash[:danger] = 'ログイン中のユーザが、タスクを登録したユーザと一致しません'
-      redirect_to '/'
-    end
+    flash[:danger] = 'ログイン中のユーザが、タスクを登録したユーザと一致しません'
+    redirect_to '/'
   end
   
   def new
@@ -35,39 +32,22 @@ class TasksController < ApplicationController
   end
   
   def update
-
-    if current_user[:id] == @task[:user_id]
-      if @task.update(task_params)
-        flash[:success] = 'Task内容を更新しました'
-        redirect_to @task
-      else
-        flash.now[:danger] = 'Task内容の更新に失敗しました'
-        render :edit
-      end
+    if @task.update(task_params)
+      flash[:success] = 'Task内容を更新しました'
+      redirect_to @task
     else
-      flash.now[:danger] = 'ログイン中のユーザが、タスクを登録したユーザと一致しません'
+      flash.now[:danger] = 'Task内容の更新に失敗しました'
       render :edit
     end
   end
   
   def destroy
-    
-    if current_user[:id] == @task[:user_id]
-      @task.destroy
-    
-      flash[:success] = 'Taskを削除しました'
-      redirect_back(fallback_location: root_path)
-    else
-      flash.now[:danger] = 'ログイン中のユーザが、タスクを登録したユーザと一致しません'
-      render :show
-    end
+    @task.destroy
+    flash[:success] = 'Taskを削除しました'
+    redirect_back(fallback_location: root_path)
   end
   
   private
-  
-  def set_task
-    @task = Task.find(params[:id])
-  end
   
   def task_params
     params.require(:task).permit(:content, :status)
